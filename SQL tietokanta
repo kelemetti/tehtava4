@@ -1,0 +1,169 @@
+DROP DATABASE IF EXISTS Vahittaismyynti;
+CREATE DATABASE Vahittaismyynti;
+USE Vahittaismyynti;
+CREATE TABLE Yritys (
+ytunnus VARCHAR(20) PRIMARY KEY,
+nimi VARCHAR(20),
+katuosoite VARCHAR(30) NOT NULL,
+postinumero INT NOT NULL,
+postitoimipaikka VARCHAR(20) NOT NULL,
+sahkoposti VARCHAR(30) NOT NULL,
+puhnro VARCHAR(30) NOT NULL,
+faxnro VARCHAR(30) NOT NULL,
+lisatty TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE Toimipiste (
+tunniste INT PRIMARY KEY AUTO_INCREMENT,
+yritys VARCHAR(30),
+nimi VARCHAR(20),
+katuosoite VARCHAR(30) NOT NULL,
+postinumero INT NOT NULL,
+postitoimipaikka VARCHAR(20) NOT NULL,
+puhnro VARCHAR(20) NOT NULL,
+sähköposti VARCHAR(30) NOT NULL,
+faxnro VARCHAR(20) NOT NULL,
+lisatty TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (yritys) REFERENCES yritys (ytunnus)
+);
+CREATE TABLE Tyontekija (
+hetu VARCHAR(11) PRIMARY KEY,
+tyotehtava VARCHAR(30) NOT NULL,
+puhelinnumero VARCHAR(30) NOT NULL,
+etunimi VARCHAR(20) NOT NULL,
+sukunimi VARCHAR(20) NOT NULL,
+palkka VARCHAR(15) NOT NULL,
+sahkoposti VARCHAR(30) NOT NULL,
+katuosoite VARCHAR(30) NOT NULL,
+postinumero INT NOT NULL,
+postitoimipaikka VARCHAR(20) NOT NULL,
+toimipiste INT,
+lisatty TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (toimipiste) REFERENCES toimipiste (tunniste)
+);
+CREATE TABLE Tuote (
+tuotetunnus INT PRIMARY KEY,
+merkki VARCHAR(20),
+malli VARCHAR(20) NOT NULL,
+yksikkohinta VARCHAR(20) NOT NULL,
+ALV VARCHAR(20) NOT NULL
+);
+CREATE TABLE Inventaario (
+toimipiste INT REFERENCES toimipiste (tunniste),
+tuote INT REFERENCES tuote (tuotetunnus),
+lisatty TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (toimipiste, tuote)
+);
+CREATE TABLE Asiakas (
+asiakasnumero INT PRIMARY KEY AUTO_INCREMENT,
+etunimi VARCHAR(20),
+sukunimi VARCHAR(30),
+ika INT NOT NULL,
+puhelinnumero VARCHAR(20) NOT NULL,
+tuntematon_asiakas VARCHAR(30),
+katuosoite VARCHAR(30) NOT NULL,
+postinumero INT NOT NULL,
+postitoimipaikka VARCHAR(20) NOT NULL,
+sahkoposti VARCHAR(30) NOT NULL
+);
+CREATE TABLE Ostotapahtuma (
+tapahtumaid INT PRIMARY KEY AUTO_INCREMENT,
+asiakasnumero INT REFERENCES asiakas (asiakasnumero),
+toimipiste INT REFERENCES toimipiste (tunniste),
+erikoisehdot VARCHAR(30) NOT NULL,
+lisatty TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE Tuotelista (
+ostotapahtuma INT REFERENCES ostotapahtuma (tapahtumaid),
+tuote INT REFERENCES tuote (tuotetunnus),
+kplmaara INT,
+PRIMARY KEY (ostotapahtuma, tuote)
+);
+
+Lisätään tauluihin tietoja:
+
+INSERT INTO Toimipiste VALUES("2", "002343-3", "Nummisenvaruste", "Kallenkatu 86", 09670, "Numminen", "0419874563",
+"kaura@nummisenvaruste.net", 098742333, null);
+INSERT INTO Toimipiste VALUES("3", "002343-3", "Porkkalanvaruste", "Porkkalantie 2", 09675, "Porkkala", "0459874562",
+"kaura@porkkalavaruste.net", 0986432, null);
+INSERT INTO Toimipiste VALUES("4", "002343-3", "Lohjanvaruste", "Lohjantie 2", 09673, "Lohja", "0469874562",
+"kaura@lohjanvaruste.net", 09871232, null);
+INSERT INTO Toimipiste VALUES("5", "002343-3", "Turunvaruste", "Turuntie 5", 09575, "Turku", "0449874562",
+"kaura@turunvaruste.net", 09756532, null);
+INSERT INTO Toimipiste VALUES("6", "002343-3", "Porinvaruste", "Porintie 9", 09665, "Pori", "0445874562",
+"kaura@porinvaruste.net", 09874545, null);
+INSERT INTO Toimipiste VALUES("7", "002343-3", "Kuusamonvaruste", "Kuusamontie 23", 09635, "Kuusamo", "0449864562",
+"kaura@kuusamonvaruste.net", 0987476, null);
+INSERT INTO Toimipiste VALUES("8", "002343-3", "Iinvaruste", "Iin tie 12", 69675, "Ii", "0449854562",
+"kaura@iinvaruste.net", 09823462, null);
+INSERT INTO Toimipiste VALUES("9", "002343-3", "Oulunvaruste", "Oululaistenkatu 32", 09578, "Oulu", "0449684562",
+"kaura@oulunvaruste.net", 09958432, null);
+INSERT INTO Toimipiste VALUES("10", "002343-3", "Keminvaruste", "Kemintie 4", 05645, "Kemi", "0419753562",
+"kaura@keminvaruste.net", 09874345, null);
+INSERT INTO tyontekija VALUES("180245-765G", "myyja", "0416541245", "Kustaa", ”Saarela", "3100", "kustaavi@gmail.com",
+"Kaurakatu 30", 01430, "Espoo", 2, null);
+INSERT INTO tyontekija VALUES("190583-197F", "myymalapaallikko", "0413457654", "Kati", "Virtanen", "5500", "Kati@gmail.com",
+"Kaurakuja 11", 01450, "Vantaa", 3, null);
+INSERT INTO tyontekija VALUES("190476-123G", "myyntiedustaja", "0440947654", "Kari", "Moisio", "3430", "Kari@gmail.com",
+"Kulhokatu 11", 01435, "Oulu", 4, null);
+INSERT INTO tyontekija VALUES("190581-234F", "myyja", "0416523654", "Outi", "Kujala", "1243”, "outi@gmail.com",
+"ohrakuja 11", 01250, "Vantaa", 5, null);
+INSERT INTO tyontekija VALUES("190565-234B", "myymalanhoitaja", "0434547654", "Jani", "Korhonen", "2750", "Jani@gmail.com",
+"Kiurukuja 11", 02340, "Kemi", 6, null);
+INSERT INTO tyontekija VALUES("310357-185N", "myyja", "0416543554", "Heikki", "Salo", "4567", "heikki@gmail.com",
+"yrjokatu 11", 01235, "Pori", 7, null);
+INSERT INTO tyontekija VALUES("180567-198N", "myyntijohtaja", "0423547654", "Justus", "Mainio", "1999", "justus@gmail.com",
+"Kuurikuja 3", 01234, "Kuusamo", 8, null);
+INSERT INTO tyontekija VALUES("190584-321F", "myyja", "0412547654", "Ahti", "Marttinen", "7546", "ahti@gmail.com",
+"Kauppatie 11", 02450, "Ii", 9, null);
+INSERT INTO tyontekija VALUES("190588-1923", "myyntimies", "0416547654", "Kaj", "Virtanen", "3020", "kaj@gmail.com",
+"Kauratie 11", 01450, "Vantaa", 10, null);
+INSERT INTO tuote VALUES(111, "Bosch", "STC324", "125", "21”);
+INSERT INTO tuote VALUES(112, "Philips", "STX43", "223", "34”);
+INSERT INTO tuote VALUES(113, "Bosch", "STC354", "543", "67”);
+INSERT INTO tuote VALUES(114, "Yamaha", "SRE324", "635", "87”);
+INSERT INTO tuote VALUES(115, "Yamaha", "SRE456", "123", "24”);
+INSERT INTO tuote VALUES(116, "LG", "STC454", "876", "99”);
+INSERT INTO tuote VALUES(117, "LG", "STC554", "999", "101”);
+INSERT INTO tuote VALUES(118, "Ferrari", "STR224", "1094", "342”);
+INSERT INTO tuote VALUES(119, "Nishiki", "STD454", "99", "6”);
+INSERT INTO tuote VALUES(120, "Nishiki", "STH424", ”2345", "543”);
+INSERT INTO Inventaario VALUES(1, 111, null);
+INSERT INTO Inventaario VALUES(2, 112, null);
+INSERT INTO Inventaario VALUES(3, 113, null);
+INSERT INTO Inventaario VALUES(4, 114, null);
+INSERT INTO Inventaario VALUES(5, 115, null);
+INSERT INTO Inventaario VALUES(6, 116, null);
+INSERT INTO Inventaario VALUES(7, 117, null);
+INSERT INTO Inventaario VALUES(8, 118, null);
+INSERT INTO Inventaario VALUES(9, 119, null);
+INSERT INTO Inventaario VALUES(10, 120, null);
+INSERT INTO Asiakas VALUES(11, ”Harri”, ”Kleemola”, 32, ”0431252341”, ””, ”Ulkopolku 4”, 01234, ”Vantaa”, ”kers@hotmail.com”);
+INSERT INTO Asiakas VALUES(12, ”Hartsa”, ”Klemola”, 31, ”0431232341”, ””, ”Oikopolku 4”, 01233, ”Kemi”, ”huhta@hotmail.com”);
+INSERT INTO Asiakas VALUES(13, ”Hillevi”, ”Kola”, 54, ”0431252261”, ””, ”Yrjupolku 4”, 01237, ”Ii”, ”gtr@hotmail.com”);
+INSERT INTO Asiakas VALUES(14, ”Urmas”, ”Joola”, 41, ”0441252341”, ””, ”Ujopolku 4”, 01239, ”Helsinki”, ”ers@hotmail.com”);
+INSERT INTO Asiakas VALUES(15, ”Taneli”, ”Hoiko”, 19, ”0431745641”, ””, ”Ulkokatu 4”, 07634, ”Turku”, ”oiu@hotmail.com”);
+INSERT INTO Asiakas VALUES(16, ”Katja”, ”Kala”, 39, ”0437642341”, ””, ”Usvakatu 4”, 08764, ”Vantaa”, ”ke4@hotmail.com”);
+INSERT INTO Asiakas VALUES(17, ”Mitja”, ”Saapolainen”, 32, ”0453954821”, ””, ”Ulkokuja 4”, 01289, ”Orimattila”, ”eiru@hotmail.com”);
+INSERT INTO Asiakas VALUES(18, ”Jiri”, ”Autti”, 35, ”0431253341”, ””, ”Ahaapolku 4”, 01234, ”Vantaa”, ”kers@hotmail.com”);
+INSERT INTO Asiakas VALUES(19, ”Emilia”, ”Kaali”, 32, ”0431232341”, ””, ”Ulkipolku 4”, 01233, ”Vantaa”, ”kern@hotmail.com”);
+INSERT INTO Asiakas VALUES(20, ”Harri”, ”Eemola”, 98, ”0431324511”, ””, ”Istupolku 4”, 09834, ”Vantaa”, ”kertoo@hotmail.com”);
+INSERT INTO Ostotapahtuma VALUES (4, 19, 4, ””, null);
+INSERT INTO Ostotapahtuma VALUES (5, 12, 5, ””, null);
+INSERT INTO Ostotapahtuma VALUES (6, 16, 1, ”maksu”, null);
+INSERT INTO Ostotapahtuma VALUES (1, 15, 8, ””, null);
+INSERT INTO Ostotapahtuma VALUES (2, 17, 9, ””, null);
+INSERT INTO Ostotapahtuma VALUES (3, 11, 2, ””, null);
+INSERT INTO Ostotapahtuma VALUES (7, 13, 3, ”käteinen”, null);
+INSERT INTO Ostotapahtuma VALUES (8, 14, 6, ””, null);
+INSERT INTO Ostotapahtuma VALUES (9, 18, 7, ”lasku”, null);
+INSERT INTO Ostotapahtuma VALUES (10, 20, 10, ””, null);
+INSERT INTO Tuotelista VALUES(5, 111, 23);
+INSERT INTO Tuotelista VALUES(6, 111, 23);
+INSERT INTO Tuotelista VALUES(4, 112, 9);
+INSERT INTO Tuotelista VALUES(1, 113, 3);
+INSERT INTO Tuotelista VALUES(2, 114, 1);
+INSERT INTO Tuotelista VALUES(3, 115, 2);
+INSERT INTO Tuotelista VALUES(7, 116, 5);
+INSERT INTO Tuotelista VALUES(8, 117, 4);
+INSERT INTO Tuotelista VALUES(9, 118, 7);
+INSERT INTO Tuotelista VALUES(10, 119, 8);
